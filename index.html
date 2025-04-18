@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lchat</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #5865F2;
+            --dark: #2C2F33;
+            --darker: #23272A;
+            --light: #FFFFFF;
+            --gray: #99AAB5;
+            --success: #57F287;
+            --danger: #ED4245;
+            --bg-color: #23272A;
+            --text-color: #FFFFFF;
+            --input-bg: #2C2F33;
+            --border-color: #40444B;
+        }
+
+        [data-theme="light"] {
+            --bg-color: #F8F9FA;
+            --text-color: #2C2F33;
+            --input-bg: #FFFFFF;
+            --border-color: #DEE2E6;
+            --darker: #E9ECEF;
+            --dark: #F8F9FA;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+        }
+
+        .title-bar {
+            height: 60px;
+            background: var(--dark);
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            gap: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .connection-form {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            margin-bottom: 4px;
+            color: var(--gray);
+        }
+
+        .form-control {
+            padding: 6px 12px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            background: var(--input-bg);
+            color: var(--text-color);
+            outline: none;
+            height: 32px;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+        }
+
+        .btn {
+            padding: 6px 12px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #4752C4;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+        }
+
+        .btn-outline:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .theme-switcher {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .theme-toggle {
+            position: relative;
+            width: 40px;
+            height: 20px;
+            border-radius: 10px;
+            background: var(--border-color);
+            cursor: pointer;
+        }
+
+        .theme-toggle::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--primary);
+            transition: transform 0.3s;
+        }
+
+        [data-theme="light"] .theme-toggle::after {
+            transform: translateX(20px);
+        }
+
+        .app-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 240px;
+            background: var(--dark);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .contacts {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+        }
+
+        .contact {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .contact:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .contact-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 8px;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .contact-info {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .contact-name {
+            font-weight: 600;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .contact-status {
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-color);
+        }
+
+        .messages {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+        }
+
+        .message {
+            margin-bottom: 16px;
+            display: flex;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--primary);
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .message-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .message-sender {
+            font-weight: 600;
+            margin-right: 8px;
+            font-size: 14px;
+        }
+
+        .message-time {
+            color: var(--gray);
+            font-size: 12px;
+        }
+
+        .message-text {
+            font-size: 14px;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+
+        .message-input-container {
+            padding: 12px;
+            background: var(--dark);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .message-input-wrapper {
+            display: flex;
+            background: var(--input-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: none;
+            background: transparent;
+            color: var(--text-color);
+            outline: none;
+            font-size: 14px;
+        }
+
+        .send-button {
+            width: 36px;
+            height: 36px;
+            border-radius: 4px;
+            background: var(--primary);
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .send-button:hover {
+            background: #4752C4;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.2);
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <div class="title-bar">
+        <div class="connection-form">
+            <div class="form-group">
+                <label for="host-input">Host</label>
+                <input type="text" id="hostInput" class="form-control" placeholder="127.0.0.1:3000">
+            </div>
+            <div class="form-group">
+                <label for="name-input">Your Name</label>
+                <input type="text" id="name-input" class="form-control" placeholder="Username">
+            </div>
+            <button onclick="setHost()" id="connect-btn" style="margin-top: auto;" class="btn btn-primary">
+                <i class="fas fa-plug"></i> Connect
+            </button>
+        </div>
+
+        <div class="theme-switcher">
+            <span id="theme-icon">
+                <i class="fas fa-moon"></i>
+            </span>
+            <div id="theme-toggle" class="theme-toggle"></div>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <div class="sidebar">
+            <div class="contacts" id="contacts">
+            </div>
+        </div>
+
+        <div class="chat-area">
+            <div class="messages" id="messagesArea">
+            </div>
+            <div class="message-input-container">
+                <div class="message-input-wrapper">
+                    <input type="text" class="message-input" id="messageInput" placeholder="Type a message...">
+                    <button onclick="sendMessage()" class="send-button" id="send-btn">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+      const enterDetector = document.getElementById('messageInput');
+
+      enterDetector.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          sendMessage()
+        }
+      });
+
+       const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const body = document.body;
+
+        themeToggle.addEventListener('click', () => {
+            const isLight = body.getAttribute('data-theme') === 'light';
+            body.setAttribute('data-theme', isLight ? 'dark' : 'light');
+            
+            const icon = isLight ? 'fa-moon' : 'fa-sun';
+            themeIcon.innerHTML = `<i class="fas ${icon}"></i>`;
+            
+
+            localStorage.setItem('theme', isLight ? 'dark' : 'light');
+        });
+
+
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        body.setAttribute('data-theme', savedTheme);
+        themeIcon.innerHTML = `<i class="fas ${savedTheme === 'light' ? 'fa-sun' : 'fa-moon'}"></i>`;
+
+      function setHost() {
+          const host = document.getElementById('hostInput')
+          if (host.value === '') {
+            window.electronAPI.setHost('127.0.0.1:3000')
+            setTimeout(() => {host.value = '127 <'}, 30)
+            setTimeout(() => {host.value = '127.0 <'}, 60)
+            setTimeout(() => {host.value = '127.0.0 <'}, 90)
+            setTimeout(() => {host.value = '127.0.0.1 <'}, 120)
+            setTimeout(() => {host.value = '127.0.0.1:3000 <'}, 130)
+            setTimeout(() => {host.value = '127.0.0.1:3000<'}, 290)
+            setTimeout(() => {host.value = '127.0.0.1:3000'}, 350)
+          } else {
+          window.electronAPI.setHost(host.value) }
+      }
+      function sendMessage() {
+          const message = document.getElementById('messageInput');
+          window.electronAPI.sendMessage(message.value);
+          message.value = ''
+      }
+      window.electronAPI.receiveMessage((event, message) => {
+          document.getElementById('messagesArea').innerHTML += `<div class="message">
+                    <div class="message-avatar">${message.id}</div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-sender">${message.id}</span>
+                            <span class="message-time">${new Date().toTimeString().slice(0, 5)}</span>
+                        </div>
+                        <div class="message-text">${message.data}</div>
+                    </div>
+                </div>`
+      });
+  </script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+{
+  "name": "lchat",
+  "version": "0.0.2",
+  "description": "PreAlpha 0.0.2",
+  "license": "ISC",
+  "author": "Casherka",
+  "type": "commonjs",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "^35.1.5",
+    "electron-builder": "^26.0.12"
+  },
+  "dependencies": {
+    "crypto": "^1.0.1",
+    "node-rsa": "^1.1.1",
+    "socket.io-client": "^4.8.1"
+  },
+  "build": {
+    "appId": "Lchat",
+    "win": {
+      "target": "portable",  
+      "icon": "build/icon.ico"
+    },
+    "mac": {
+      "target": "dmg",   
+      "icon": "build/icon.icns"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+}
+}
